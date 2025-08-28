@@ -1,181 +1,880 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>استمارة التحكيم</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>استمارة التمثلات الاجتماعية عن الإعاقة</title>
   <style>
-    body { font-family: system-ui, "Segoe UI", Tahoma, Arial; line-height: 1.7; margin: 0; background:#fafafa; color:#222; }
-    .container { max-width: 900px; margin: 24px auto; background:#fff; padding: 24px; border-radius: 16px; box-shadow: 0 6px 24px rgba(0,0,0,.06); }
-    h1, h2 { margin-top: 0; }
-    .page { display: none; }
-    .page.active { display: block; }
-    .navigation-buttons { display: flex; gap: 12px; margin-top: 20px; }
-    .btn { padding: 10px 16px; border: none; border-radius: 10px; cursor: pointer; background:#1a73e8; color:#fff; font-weight:600; }
-    .btn:disabled { opacity:.5; cursor: not-allowed; }
-    .btn-secondary { background:#737373; }
-    .progress { background:#eee; height:10px; border-radius:999px; overflow:hidden; margin: 16px 0 24px; }
-    .progress > span { display:block; height:100%; width:0%; background:#1a73e8; transition:width .3s; }
-    .field { margin: 12px 0; }
-    label { display:block; margin-bottom:6px; font-weight:600; }
-    input[type="text"], textarea, select { width: 100%; padding: 10px; border-radius: 10px; border:1px solid #ddd; }
-    .hint { color:#666; font-size:.9em; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+    .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; }
+    .header { background: linear-gradient(45deg, #2c3e50, #3498db); color: white; padding: 30px; text-align: center; }
+    .header h1 { font-size: 2.2em; margin-bottom: 10px; }
+    .header p { font-size: 1.1em; opacity: 0.9; }
+    .content { padding: 40px; }
+    .stage { display: none; animation: fadeIn 0.5s ease-in; }
+    .stage.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .stage-title { font-size: 1.5em; color: #2c3e50; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 3px solid #3498db; }
+    .input-group { margin-bottom: 20px; }
+    .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+    .input-group input { width: 100%; padding: 12px 15px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; transition: border-color 0.3s; }
+    .input-group input:focus { outline: none; border-color: #3498db; }
+    
+    /* تصميم الكارتات */
+    .word-card { background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 10px; padding: 20px; margin-bottom: 20px; transition: all 0.3s; }
+    .word-card:hover { border-color: #3498db; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2); }
+    .card-word { font-size: 1.3em; font-weight: bold; color: #2c3e50; margin-bottom: 15px; text-align: center; padding: 10px; background: #fff; border-radius: 8px; }
+    .card-textarea { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 8px; resize: vertical; min-height: 100px; font-family: inherit; font-size: 16px; }
+    .card-textarea:focus { outline: none; border-color: #3498db; }
+    
+    /* تصميم الجداول */
+    .response-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .response-table th { background: linear-gradient(45deg, #3498db, #2980b9); color: white; padding: 15px; text-align: center; font-weight: bold; }
+    .response-table td { padding: 15px; text-align: center; border-bottom: 1px solid #eee; }
+    .response-table tr:hover { background: #f8f9fa; }
+    .table-word { font-weight: bold; color: #2c3e50; text-align: right; background: #f8f9fa; }
+    
+    /* خيارات الترتيب */
+    .ranking-options { display: flex; justify-content: center; gap: 15px; }
+    .ranking-radio { display: flex; flex-direction: column; align-items: center; }
+    .ranking-radio input[type="radio"] { width: 20px; height: 20px; margin-bottom: 5px; cursor: pointer; }
+    .ranking-radio label { font-size: 14px; color: #666; cursor: pointer; }
+    .ranking-radio input[type="radio"]:checked + label { color: #3498db; font-weight: bold; }
+    .ranking-radio.used { background-color: #f8f8f8; border-radius: 4px; padding: 4px; }
+    .ranking-radio.used label { color: #999; text-decoration: line-through; opacity: 0.6; }
+    
+    /* خيارات المشاعر */
+    .sentiment-options { display: flex; justify-content: center; gap: 20px; }
+    .sentiment-radio { display: flex; flex-direction: column; align-items: center; }
+    .sentiment-radio input[type="radio"] { width: 20px; height: 20px; margin-bottom: 5px; cursor: pointer; }
+    .sentiment-radio label { font-size: 14px; color: #666; cursor: pointer; }
+    .sentiment-radio input[type="radio"]:checked + label { color: #3498db; font-weight: bold; }
+    
+    .progress-bar { width: 100%; height: 6px; background: #ecf0f1; border-radius: 3px; margin-bottom: 30px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(45deg, #3498db, #2980b9); border-radius: 3px; transition: width 0.5s ease; }
+    .error-message { color: #e74c3c; background: #fdf2f2; padding: 10px; border-radius: 5px; margin-top: 10px; display: none; }
+    .btn { background: linear-gradient(45deg, #3498db, #2980b9); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-size: 16px; cursor: pointer; transition: all 0.3s; margin-top: 20px; }
+    .btn:hover { background: linear-gradient(45deg, #2980b9, #3498db); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3); }
+    
+    /* البيانات الديموغرافية */
+    .demo-input-group { margin-bottom: 25px; }
+    .demo-input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; font-size: 1.1em; }
+    .radio-group { margin-top: 10px; }
+    .radio-item { margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+    .radio-item input[type="radio"] { width: 18px; height: 18px; cursor: pointer; }
+    .radio-item label { font-weight: normal; cursor: pointer; color: #666; margin: 0; }
+    .text-with-radio { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .inline-input { width: auto; min-width: 200px; }
+    
+    @media (max-width: 768px) {
+      .container { margin: 10px; border-radius: 10px; }
+      .content { padding: 20px; }
+      .response-table { font-size: 14px; }
+      .response-table th, .response-table td { padding: 10px 8px; }
+      .ranking-options, .sentiment-options { gap: 10px; }
+      .text-with-radio { flex-direction: column; align-items: flex-start; }
+      .inline-input { width: 100%; }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>استمارة التحكيم</h1>
-    <div class="progress"><span id="progressFill"></span></div>
-
-    <!-- الصفحة 0: الغلاف -->
-    <section class="page active" id="page0">
-      <h2>مرحبًا بك</h2>
-      <p>اضغط الزر لبدء التحكيم.</p>
-      <div class="navigation-buttons">
-        <button class="btn" id="startBtn" type="button">بدء التحكيم</button>
-      </div>
-    </section>
-
-    <!-- الصفحة 1: مثال لأسئلة (عدّلها لاحقًا كما تريد) -->
-    <section class="page" id="page1">
-      <h2>المحور الأول</h2>
-      <div class="field">
-        <label>اسم المقيّم</label>
-        <input type="text" name="اسم المقيّم" placeholder="مثال: د. أحمد"/>
-      </div>
-      <div class="field">
-        <label>مستوى الرضا</label>
-        <select name="مستوى الرضا">
-          <option value="">اختر...</option>
-          <option value="1">1 - منخفض</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5 - مرتفع</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>ملاحظات</label>
-        <textarea name="الملاحظات" rows="4" placeholder="اكتب ملاحظاتك"></textarea>
-      </div>
-
-      <div class="navigation-buttons">
-        <button class="btn-secondary btn" type="button" id="prev1">السابق</button>
-        <button class="btn" type="button" id="next1">التالي</button>
-      </div>
-    </section>
-
-    <!-- الصفحة 2: مثال محاور إضافية -->
-    <section class="page" id="page2">
-      <h2>المحور الثاني</h2>
-      <div class="field">
-        <label>عناصر القوة (اختر ما ينطبق)</label>
-        <label><input type="checkbox" name="عناصر القوة" value="تنظيم جيد"> تنظيم جيد</label>
-        <label><input type="checkbox" name="عناصر القوة" value="وضوح في الأهداف"> وضوح في الأهداف</label>
-        <label><input type="checkbox" name="عناصر القوة" value="تفاعل المشاركين"> تفاعل المشاركين</label>
-      </div>
-
-      <div class="navigation-buttons">
-        <button class="btn-secondary btn" type="button" id="prev2">السابق</button>
-        <button class="btn" type="button" id="next2">التالي</button>
-      </div>
-    </section>
-
-    <!-- الصفحة الأخيرة: الإرسال -->
-    <section class="page" id="page3">
-      <h2>إرسال التحكيم</h2>
-      <p class="hint">عند الضغط على "إرسال التحكيم" سيتم إرسال البيانات إلى Google Sheet.</p>
-      <div class="navigation-buttons">
-        <button class="btn-secondary btn" type="button" id="prev3">السابق</button>
-        <button class="btn" type="button" id="submitBtn">إرسال التحكيم</button>
-      </div>
-    </section>
-
+<div class="container">
+  <div class="header">
+    <h1>استمارة التمثلات الاجتماعية عن الإعاقة</h1>
+    <p>دراسة التداعي الحر للكلمات المرتبطة بالإعاقة</p>
   </div>
 
-  <script>
-    // ====== بيانات النموذج في الذاكرة المحلية
-    window.formData = {}
+  <div class="content">
+    <!-- الصفحة الترحيبية -->
+    <div class="stage active" id="welcome">
+      <div class="stage-title">مرحباً بكم في البحث</div>
+      <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; line-height: 1.8; margin-bottom: 25px;">
+        <p style="margin-bottom: 20px;"><strong>الأستاذ(ة) المحترم(ة)، تحية طيبة:</strong></p>
+        
+        <p style="margin-bottom: 20px;">عرف النظام التربوي المغربي في السنوات الأخيرة عدة تغيرات تخص <strong>موضوع التربية الدامجة والإعاقة</strong>، ورأي الأستاذ الممارس في القسم مهم في تقييم أثر هذه التغيرات.</p>
+        
+        <p style="margin-bottom: 20px;">في هذا البحث الجامعي، أسعى —بوصفي زميلاً ممارساً— إلى توثيق آرائنا نحن الأساتذة، وتقديم وجهة نظرنا في ما تشهده المنظومة التربوية من تغيرات.</p>
+        
+        <p style="margin-bottom: 20px;">مشاركتكم تطوعية، وجميع المعلومات سرية تماماً. ولا توجد إجابات صحيحة ولا خاطئة؛ ما يهم هو أن تعبّروا بكل حرية عن ما يخطر ببالكم، سواء كان رأياً شخصياً أو ما تعتقدون أن بقية الزملاء قد يقولونه.</p>
+        
+        <p style="margin-bottom: 0;">المشاركة لن تستغرق أكثر من <strong>15 دقيقة</strong>.</p>
+      </div>
+      <button class="btn" onclick="startSurvey()">بدء الاستمارة</button>
+    </div>
 
-    // ====== الصفحات والتنقل
-    const pages = Array.from(document.querySelectorAll('.page'));
-    let currentPage = 0;
+    <div class="progress-bar" id="progressContainer" style="display: none;">
+      <div class="progress-fill" id="progressFill" style="width: 10%"></div>
+    </div>
 
-    function updateProgress() {
-      const fill = document.getElementById('progressFill');
-      const progress = ((currentPage + 1) / pages.length) * 100;
-      fill.style.width = progress + '%';
+    <!-- القسم الأول -->
+    <div class="stage" id="stage1">
+      <div class="stage-title">1. جمع المعطيات Le recueil des données</div>
+      <div style="margin-bottom: 20px; color: #666; line-height: 1.6;">
+        <p style="margin-bottom: 15px;">عندما تسمع كلمة "إعاقة ذهنية"، ما أول خمس (5) كلمات أو عبارات تخطر ببالك؟</p>
+        <p style="margin-bottom: 15px;">رجاء، اكتب <strong>فوراً</strong> ومن دون تفكير مطول ما يخطر ببالك. يمكن أن تكون هذه الكلمات والعبارات: أسماء، أو صفات أو مشاعر أو أفكار،...</p>
+        <p style="margin-bottom: 0;"><strong>ليس هناك إجابات صحيحة وأخرى خاطئة،</strong> المهم أن تعبر بحرية وبشكل شخصي.</p>
+      </div>
+      <div class="input-group"><label>الكلمة/العبارة 1:</label><input type="text" id="word1"/></div>
+      <div class="input-group"><label>الكلمة/العبارة 2:</label><input type="text" id="word2"/></div>
+      <div class="input-group"><label>الكلمة/العبارة 3:</label><input type="text" id="word3"/></div>
+      <div class="input-group"><label>الكلمة/العبارة 4:</label><input type="text" id="word4"/></div>
+      <div class="input-group"><label>الكلمة/العبارة 5:</label><input type="text" id="word5"/></div>
+      <div class="error-message" id="error1">يرجى إدخال جميع العناصر الخمسة</div>
+      <div class="error-message" id="duplicateWords">⚠️ يمنع تكرار نفس الكلمة/العبارة. الرجاء تعديل الإدخال.</div>
+      <button class="btn" onclick="nextStage(1)">التالي</button>
+    </div>
+
+    <div class="stage" id="stage2">
+      <div class="stage-title">1. التوضيح والسياق الدلالي Contextualisation sémantique</div>
+      <p style="margin-bottom: 20px; color: #666; line-height: 1.6;">تجنبًا لسوء الفهم، رجاء اكتب جملة قصيرة توضح فيها لماذا رَبطت كل كلمة/عبارة من الكلمات/العبارات الخمس المذكورة آنفا بلفظ "الإعاقة الذهنية":</p>
+      <div id="explanationCards"></div>
+      <div class="error-message" id="error2">يرجى شرح جميع العناصر قبل المتابعة</div>
+      <button class="btn" onclick="nextStage(2)">التالي</button>
+    </div>
+
+    <div class="stage" id="stage3">
+      <div class="stage-title">الترتيب بحسب الأهمية L'évocation hiérarchisée</div>
+      <p style="margin-bottom: 20px; color: #666; line-height: 1.6;">رجاء رتب الكلمات/العبارات الخمس التي قلتها آنفا بحسب أهميتها عندك شخصيًا، استعمل الأرقام للدلالة على الأهمية: <strong>1=الأهم، 5=الأقل أهمية</strong>، كلما قل الرقم زادت الأهمية.</p>
+      <table class="response-table" id="rankingTable">
+        <thead>
+          <tr>
+            <th style="width: 50%">الكلمة/العبارة</th>
+            <th style="width: 50%">الأهمية (1-5)</th>
+          </tr>
+        </thead>
+        <tbody id="rankingTableBody">
+        </tbody>
+      </table>
+      <div class="error-message" id="error3">يرجى تعيين درجة مختلفة لكل العناصر الخمسة.</div>
+      <button class="btn" onclick="nextStage(3)">التالي</button>
+    </div>
+
+    <div class="stage" id="stage4">
+      <div class="stage-title">تعيين الانطباع الانفعالي Connotation</div>
+      <p style="margin-bottom: 20px; color: #666; line-height: 1.6;">أمام كل كلمة أو عبارة ذكرتها، حدد نوع الشعور الذي تثيره عندك بتحديد الخانة المناسبة؛ ليس هناك شعور "صحيح" وآخر "خاطئ"؛ فالأمر شخصي تماماً.</p>
+      <table class="response-table" id="sentimentTable">
+        <thead>
+          <tr>
+            <th style="width: 40%">الكلمة/العبارة</th>
+            <th style="width: 60%">الشعور</th>
+          </tr>
+        </thead>
+        <tbody id="sentimentTableBody">
+        </tbody>
+      </table>
+      <div class="error-message" id="error4">يرجى تحديد الشعور لكل العناصر</div>
+      <button class="btn" onclick="nextStage(4)">التالي</button>
+    </div>
+
+    <!-- القسم الثاني -->
+    <div class="stage" id="stage5">
+      <div class="stage-title">رأي بقية الأساتذة Consigne de substitution</div>
+      <div style="margin-bottom: 20px; color: #666; line-height: 1.6;">
+        <p style="margin-bottom: 0;">تعرفنا على رأيك الخاص، ونرجو منك الآن أن تحدثنا، بناء على خبرتك وتوقعك، عن رأي بقية الأساتذة كما تتوقعه أنت. ولنبدأ بالسؤال الأول: في رأيك، إذا سألنا معظم الأساتذة الآخرين عن كلمة «الإعاقة الذهنية»، ما هي أول خمس (5) كلمات أو عبارات تظن أنهم سيذكرونها؟</p>
+      </div>
+      <div class="input-group"><label>الكلمة/العبارة 1:</label><input type="text" id="wordB1"/></div>
+      <div class="input-group"><label>الكلمة/العبارة 2:</label><input type="text" id="wordB2"/></div>
+      <div class="input-group"><label>الكلمة/العبارة 3:</label><input type="text" id="wordB3"/></div>
+      <div class="input-group"><label>الكلمة/العبارة 4:</label><input type="text" id="wordB4"/></div>
+      <div class="input-group"><label>الكلمة/العبارة 5:</label><input type="text" id="wordB5"/></div>
+      <div class="error-message" id="error1b">يرجى إدخال جميع العناصر الخمسة</div>
+      <div class="error-message" id="duplicateWords2">⚠️ يمنع تكرار نفس الكلمة/العبارة داخل هذا القسم.</div>
+      <button class="btn" onclick="nextStage(5)">التالي</button>
+    </div>
+
+    <div class="stage" id="stage6">
+      <div class="stage-title">التوضيح والسياق الدلالي (بقية الأساتذة)</div>
+      <p style="margin-bottom: 20px; color: #666; line-height: 1.6;">تجنبا لسوء الفهم، اشرح بإيجاز ماذا قد يقصد الأساتذة الآخرون بكل كلمة من هذه الكلمات:</p>
+      <div id="explanationCards2"></div>
+      <div class="error-message" id="error2b">يرجى شرح جميع العناصر قبل المتابعة</div>
+      <button class="btn" onclick="nextStage(6)">التالي</button>
+    </div>
+
+    <div class="stage" id="stage7">
+      <div class="stage-title">الترتيب بحسب الأهمية (بقية الأساتذة)</div>
+      <p style="margin-bottom: 20px; color: #666; line-height: 1.6;">رتّب هذه الكلمات حسب الأهمية التي تعتقد أن بقية الأساتذة يعطونها لها (<strong>1 = الأهم، 5 = الأقل أهمية</strong>).</p>
+      <table class="response-table" id="rankingTable2">
+        <thead>
+          <tr>
+            <th style="width: 50%">الكلمة/العبارة</th>
+            <th style="width: 50%">الأهمية (1-5)</th>
+          </tr>
+        </thead>
+        <tbody id="rankingTableBody2">
+        </tbody>
+      </table>
+      <div class="error-message" id="error3b">يرجى تعيين درجة مختلفة لكل العناصر الخمسة.</div>
+      <button class="btn" onclick="nextStage(7)">التالي</button>
+    </div>
+
+    <div class="stage" id="stage8">
+      <div class="stage-title">تعيين الانطباع الانفعالي (بقية الأساتذة)</div>
+      <p style="margin-bottom: 20px; color: #666; line-height: 1.6;">برأيك، هل هذه الكلمات تثير لدى بقية الأساتذة شعوراً إيجابياً، محايداً، أم سلبياً؟</p>
+      <table class="response-table" id="sentimentTable2">
+        <thead>
+          <tr>
+            <th style="width: 40%">الكلمة/العبارة</th>
+            <th style="width: 60%">الشعور</th>
+          </tr>
+        </thead>
+        <tbody id="sentimentTableBody2">
+        </tbody>
+      </table>
+      <div class="error-message" id="error4b">يرجى تحديد الشعور لكل العناصر</div>
+      <button class="btn" onclick="nextStage(8)">التالي</button>
+    </div>
+
+    <!-- المعلومات الديموغرافية -->
+    <div class="stage" id="stage9">
+      <div class="stage-title">معلومات أساسية</div>
+      <p style="margin-bottom: 30px; color: #666; line-height: 1.6;">رجاء املأ المعلومات التالية:</p>
+      
+      <div class="demo-input-group">
+        <label>1. العمر:</label>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <input type="number" id="age" min="20" max="70" style="width: 100px;"/> 
+          <span style="color: #666;">سنة</span>
+        </div>
+      </div>
+
+      <div class="demo-input-group">
+        <label>2. الجنس:</label>
+        <div class="radio-group">
+          <div class="radio-item">
+            <input type="radio" id="gender_male" name="gender" value="ذكر"/>
+            <label for="gender_male">ذكر</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="gender_female" name="gender" value="أنثى"/>
+            <label for="gender_female">أنثى</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-input-group">
+        <label>3. إجمالي سنوات الخبرة في التعليم الابتدائي:</label>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <input type="number" id="experience" min="0" max="45" style="width: 100px;"/> 
+          <span style="color: #666;">سنة/سنوات</span>
+        </div>
+      </div>
+
+      <div class="demo-input-group">
+        <label>4. المؤهل الدراسي:</label>
+        <div class="radio-group">
+          <div class="radio-item">
+            <input type="radio" id="qual_bac" name="qualification" value="البكالوريا"/>
+            <label for="qual_bac">البكالوريا</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="qual_license" name="qualification" value="الإجازة"/>
+            <label for="qual_license">الإجازة</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="qual_master" name="qualification" value="الماستر"/>
+            <label for="qual_master">الماستر</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="qual_phd" name="qualification" value="الدكتوراه"/>
+            <label for="qual_phd">الدكتوراه</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="qual_other" name="qualification" value="مؤهلات أخرى"/>
+            <label for="qual_other">مؤهلات أخرى</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-input-group">
+        <label>5. ما هي المؤهلات ذات الصلة بالإعاقة الذهنية التي تملكها:</label>
+        <div class="radio-group">
+          <div class="radio-item">
+            <input type="radio" id="disability_qual_none" name="disability_qualification" value="لا توجد"/>
+            <label for="disability_qual_none">لا توجد</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="disability_qual_diploma" name="disability_qualification" value="دبلوم في التربية الخاصة"/>
+            <label for="disability_qual_diploma">دبلوم في التربية الخاصة</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="disability_qual_learning" name="disability_qualification" value="تكوين في صعوبات التعلم"/>
+            <label for="disability_qual_learning">تكوين في صعوبات التعلم</label>
+          </div>
+          <div class="radio-item text-with-radio">
+            <input type="radio" id="disability_qual_other" name="disability_qualification" value="أخرى"/>
+            <label for="disability_qual_other">أخرى، اذكرها:</label>
+            <input type="text" id="disability_qual_other_text" class="inline-input" disabled/>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-input-group">
+        <label>6. هل لديك تجربة شخصية مع أشخاص ذوي إعاقة ذهنية (خارج إطار التدريس)؟</label>
+        <div class="radio-group">
+          <div class="radio-item">
+            <input type="radio" id="personal_exp_none" name="personal_experience" value="لا توجد تجربة"/>
+            <label for="personal_exp_none">لا توجد تجربة</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="personal_exp_family" name="personal_experience" value="نعم، مع قريب من العائلة"/>
+            <label for="personal_exp_family">نعم، مع قريب من العائلة</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="personal_exp_friend" name="personal_experience" value="نعم، مع صديق أو أحد المعارف"/>
+            <label for="personal_exp_friend">نعم، مع صديق أو أحد المعارف</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="personal_exp_work" name="personal_experience" value="نعم، في إطار عمل أو تطوع في مؤسسة متخصصة"/>
+            <label for="personal_exp_work">نعم، في إطار عمل أو تطوع في مؤسسة متخصصة</label>
+          </div>
+          <div class="radio-item text-with-radio">
+            <input type="radio" id="personal_exp_other" name="personal_experience" value="تجارب أخرى"/>
+            <label for="personal_exp_other">تجارب أخرى، أذكرها:</label>
+            <input type="text" id="personal_exp_other_text" class="inline-input" disabled/>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-input-group">
+        <label>7. هل سبق لك تدريس تلاميذ ذوي إعاقة ذهنية في إطار التربية الدامجة؟</label>
+        <div class="radio-group">
+          <div class="radio-item">
+            <input type="radio" id="teaching_exp_no" name="teaching_experience" value="لا، لم يسبق لي ذلك مطلقاً"/>
+            <label for="teaching_exp_no">لا، لم يسبق لي ذلك مطلقاً</label>
+          </div>
+          <div class="radio-item">
+            <input type="radio" id="teaching_exp_other_disability" name="teaching_experience" value="لا، لكن درست تلاميذ في وضعيات إعاقة أخرى"/>
+            <label for="teaching_exp_other_disability">لا، لكن درست تلاميذ في وضعيات إعاقة أخرى</label>
+          </div>
+          <div class="radio-item text-with-radio">
+            <input type="radio" id="teaching_exp_yes" name="teaching_experience" value="نعم"/>
+            <label for="teaching_exp_yes">نعم، درست تلاميذ في وضعية إعاقة ذهنية لمدة:</label>
+            <input type="number" id="teaching_exp_years" min="0" max="45" style="width: 80px;" disabled/>
+            <span style="color: #666;">سنة/سنوات</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-message" id="error9">يرجى ملء جميع المعلومات المطلوبة</div>
+      <button class="btn" onclick="showResults()">إنهاء الاستمارة</button>
+    </div>
+
+    <div class="stage" id="results">
+      <div class="stage-title">انتهاء الاستمارة</div>
+      <div style="background: #d4edda; color: #155724; padding: 30px; border-radius: 10px; margin-top: 20px; border: 1px solid #c3e6cb; text-align: center; line-height: 1.8;">
+        <h3 style="margin-bottom: 20px; color: #155724;">✅ تم إرسال إجاباتكم بنجاح!</h3>
+        <p style="font-size: 1.1em; margin: 0;">شكرا لكم على المشاركة في هذا البحث. خالص الود</p>
+      </div>
+    </div>
+
+    <div id="testResults" style="display:none; margin-top:16px;"></div>
+  </div>
+</div>
+
+<script>
+  // الحالة العامة
+  let words = [], words2 = [];
+  let explanations = {}, explanations2 = {};
+  let rankings = {}, rankings2 = {}; // word -> 1..5 (1=الأهم)
+  let sentiments = {}, sentiments2 = {};
+  let currentStage = 1;
+  const totalStages = 10;
+
+  // أدوات مساعدة
+  function normalizeWord(w){
+    return w
+      .normalize('NFKC')
+      .replace(/\u0640/g, '') // إزالة التطويل
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ' ');
+  }
+  function updateProgress(){
+    const progress = Math.max(1, Math.min(totalStages, currentStage)) / totalStages * 100;
+    const bar = document.getElementById('progressFill');
+    if (bar) bar.style.width = progress + '%';
+  }
+  function switchStage(fromId, toId){
+    document.getElementById(fromId).classList.remove('active');
+    document.getElementById(toId).classList.add('active');
+    currentStage++; updateProgress();
+  }
+  function show(id){ document.getElementById(id).style.display='block'; }
+  function hide(id){ document.getElementById(id).style.display='none'; }
+
+  function startSurvey(){
+    document.getElementById('welcome').classList.remove('active');
+    document.getElementById('stage1').classList.add('active');
+    document.getElementById('progressContainer').style.display = 'block';
+    currentStage = 1;
+    updateProgress();
+  }
+
+  // تدفق المراحل
+  function nextStage(stage){
+    if (stage === 1) {
+      words = []; const seen = new Set(); let hasDuplicate = false;
+      for (let i=1;i<=5;i++){
+        const raw = document.getElementById(`word${i}`).value; const word = raw.trim();
+        if (!word) { show('error1'); hide('duplicateWords'); return; }
+        const key = normalizeWord(word); if (seen.has(key)) hasDuplicate = true; seen.add(key);
+        words.push(word);
+      }
+      hide('error1'); if (hasDuplicate) { show('duplicateWords'); return; } hide('duplicateWords');
+      setupExplanationCards(); switchStage('stage1','stage2');
+    } else if (stage === 2) {
+      explanations = {}; let ok = true;
+      for (let i=0;i<words.length;i++){
+        const t = document.getElementById(`cardtext${i}`).value.trim(); if(!t){ ok=false; break; }
+        explanations[words[i]] = t;
+      }
+      if (!ok) { show('error2'); return; } hide('error2');
+      setupRankingTable(); switchStage('stage2','stage3');
+    } else if (stage === 3) {
+      if (!validateRankings(1)) { show('error3'); return; } hide('error3');
+      setupSentimentTable(); switchStage('stage3','stage4');
+    } else if (stage === 4) {
+      if (!collectSentiments(1)) { show('error4'); return; } hide('error4');
+      switchStage('stage4','stage5');
+    } else if (stage === 5) {
+      words2 = []; const seen2 = new Set(); let dup2 = false;
+      for (let i=1;i<=5;i++){
+        const raw = document.getElementById(`wordB${i}`).value; const w = raw.trim();
+        if (!w) { show('error1b'); hide('duplicateWords2'); return; }
+        const key = normalizeWord(w); if (seen2.has(key)) dup2 = true; seen2.add(key);
+        words2.push(w);
+      }
+      hide('error1b'); if (dup2) { show('duplicateWords2'); return; } hide('duplicateWords2');
+      setupExplanationCards2(); switchStage('stage5','stage6');
+    } else if (stage === 6) {
+      explanations2 = {}; let ok2 = true;
+      for (let i=0;i<words2.length;i++){
+        const t = document.getElementById(`cardtext2_${i}`).value.trim(); if(!t){ ok2=false; break; }
+        explanations2[words2[i]] = t;
+      }
+      if (!ok2) { show('error2b'); return; } hide('error2b');
+      setupRankingTable2(); switchStage('stage6','stage7');
+    } else if (stage === 7) {
+      if (!validateRankings(2)) { show('error3b'); return; } hide('error3b');
+      setupSentimentTable2(); switchStage('stage7','stage8');
+    } else if (stage === 8) {
+      if (!collectSentiments(2)) { show('error4b'); return; } hide('error4b');
+      switchStage('stage8','stage9');
     }
+  }
 
-    function goTo(i) {
-      if (i < 0 || i >= pages.length) return;
-      pages[currentPage].classList.remove('active');
-      currentPage = i;
-      pages[currentPage].classList.add('active');
-      updateProgress();
-      window.scrollTo(0,0);
-    }
+  // إنشاء كارتات الشرح
+  function setupExplanationCards(){
+    const container = document.getElementById('explanationCards'); 
+    container.innerHTML='';
+    words.forEach((w,i)=>{
+      const card = document.createElement('div'); 
+      card.className='word-card';
+      card.innerHTML = `
+        <div class="card-word">${w}</div>
+        <textarea class="card-textarea" id="cardtext${i}" placeholder="اشرح علاقة هذه الكلمة بالإعاقة الذهنية..."></textarea>
+      `;
+      container.appendChild(card);
+    });
+  }
 
-    function nextPage() { saveCurrentPageData(); goTo(currentPage + 1); }
-    function prevPage() { saveCurrentPageData(); goTo(currentPage - 1); }
+  function setupExplanationCards2(){
+    const container = document.getElementById('explanationCards2'); 
+    container.innerHTML='';
+    words2.forEach((w,i)=>{
+      const card = document.createElement('div'); 
+      card.className='word-card';
+      card.innerHTML = `
+        <div class="card-word">${w}</div>
+        <textarea class="card-textarea" id="cardtext2_${i}" placeholder="لماذا تتوقع ارتباط هذه الكلمة بالإعاقة الذهنية لدى بقية الأساتذة؟"></textarea>
+      `;
+      container.appendChild(card);
+    });
+  }
 
-    // ====== حفظ الصفحة الحالية بدون تكرار للـ checkbox
-    function saveCurrentPageData() {
-      const el = pages[currentPage];
-      const inputs = el.querySelectorAll('input, textarea, select');
-      const pageData = {};
+  // إنشاء جداول الترتيب
+  function setupRankingTable(){
+    const tbody = document.getElementById('rankingTableBody'); 
+    tbody.innerHTML='';
+    rankings = {};
+    
+    words.forEach((w,i)=>{
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td class="table-word">${w}</td>
+        <td>
+          <div class="ranking-options">
+            ${[1,2,3,4,5].map(r=>`
+              <div class="ranking-radio" id="rank1_${i}_${r}">
+                <input type="radio" id="rank_${i}_${r}" name="ranking_${i}" value="${r}" onchange="handleRankingChange(1, '${w}', ${r})"/>
+                <label for="rank_${i}_${r}">${r}</label>
+              </div>`).join('')}
+          </div>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
 
-      inputs.forEach(input => {
-        const name = input.name;
-        if (!name) return;
-        const type = (input.type || '').toLowerCase();
-        if (type === 'checkbox') {
-          if (!pageData[name]) pageData[name] = [];
-          if (input.checked) pageData[name].push(input.value);
-        } else if (type === 'radio') {
-          if (input.checked) pageData[name] = input.value;
-        } else {
-          pageData[name] = input.value || '';
+  function setupRankingTable2(){
+    const tbody = document.getElementById('rankingTableBody2'); 
+    tbody.innerHTML='';
+    rankings2 = {};
+    
+    words2.forEach((w,i)=>{
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td class="table-word">${w}</td>
+        <td>
+          <div class="ranking-options">
+            ${[1,2,3,4,5].map(r=>`
+              <div class="ranking-radio" id="rank2_${i}_${r}">
+                <input type="radio" id="rank2_${i}_${r}" name="ranking2_${i}" value="${r}" onchange="handleRankingChange(2, '${w}', ${r})"/>
+                <label for="rank2_${i}_${r}">${r}</label>
+              </div>`).join('')}
+          </div>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  // معالجة الترتيب
+  function handleRankingChange(section, word, rank) {
+    const currentRankings = section === 1 ? rankings : rankings2;
+    const otherWord = Object.keys(currentRankings).find(k => currentRankings[k] === rank);
+    
+    if (otherWord && otherWord !== word) {
+      // إلغاء الاختيار السابق
+      document.querySelectorAll(`input[name^="ranking${section === 2 ? '2' : ''}_"]:checked`).forEach(input => {
+        if (parseInt(input.value) === rank && input !== event.target) {
+          input.checked = false;
         }
       });
-
-      Object.assign(window.formData, pageData);
-      try { localStorage.setItem('evaluationFormData', JSON.stringify(window.formData)); } catch (e) {}
+      delete currentRankings[otherWord];
     }
+    
+    currentRankings[word] = rank;
+    updateRankingVisuals(section);
+  }
 
-    // ====== إرسال إلى Google Apps Script (بصيغة x-www-form-urlencoded)
-    async function submitForm() {
-      saveCurrentPageData();
-      const params = new URLSearchParams();
-      for (const [k, v] of Object.entries(window.formData)) {
-        if (Array.isArray(v)) params.append(k, v.join('; '));
-        else params.append(k, v ?? '');
+  function updateRankingVisuals(section) {
+    const currentRankings = section === 1 ? rankings : rankings2;
+    const usedRanks = Object.values(currentRankings);
+    
+    document.querySelectorAll(`.ranking-radio`).forEach(div => {
+      if (div.id.startsWith(`rank${section === 2 ? '2' : '1'}_`)) {
+        const rank = parseInt(div.querySelector('input').value);
+        if (usedRanks.includes(rank)) {
+          div.classList.add('used');
+        } else {
+          div.classList.remove('used');
+        }
       }
-      try {
-        await fetch('https://script.google.com/macros/s/AKfycbynE0vkK3HTcbkpRecHKpkcnPGS3MvelMvJboYvQKpQ4IOAK6bgOxnOlxbJghYpGbgQxQ/exec', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-          body: params.toString(),
-          mode: 'no-cors'
-        });
-        alert('تم إرسال النموذج ✔');
-      } catch (e) {
-        console.error(e);
-        alert('تعذّر الإرسال. تأكد من إعداد Web App.');
+    });
+  }
+
+  function validateRankings(section) {
+    const currentRankings = section === 1 ? rankings : rankings2;
+    const wordCount = section === 1 ? words.length : words2.length;
+    
+    if (Object.keys(currentRankings).length !== wordCount) return false;
+    
+    const ranks = Object.values(currentRankings);
+    const uniqueRanks = new Set(ranks);
+    
+    return uniqueRanks.size === wordCount && ranks.every(r => r >= 1 && r <= 5);
+  }
+
+  // إنشاء جداول المشاعر
+  function setupSentimentTable(){
+    const tbody = document.getElementById('sentimentTableBody'); 
+    tbody.innerHTML='';
+    
+    words.forEach((w,i)=>{
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td class="table-word">${w}</td>
+        <td>
+          <div class="sentiment-options">
+            <div class="sentiment-radio">
+              <input type="radio" id="sent_${i}_pos" name="sentiment_${i}" value="positive"/>
+              <label for="sent_${i}_pos">إيجابي</label>
+            </div>
+            <div class="sentiment-radio">
+              <input type="radio" id="sent_${i}_neu" name="sentiment_${i}" value="neutral"/>
+              <label for="sent_${i}_neu">محايد</label>
+            </div>
+            <div class="sentiment-radio">
+              <input type="radio" id="sent_${i}_neg" name="sentiment_${i}" value="negative"/>
+              <label for="sent_${i}_neg">سلبي</label>
+            </div>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  function setupSentimentTable2(){
+    const tbody = document.getElementById('sentimentTableBody2'); 
+    tbody.innerHTML='';
+    
+    words2.forEach((w,i)=>{
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td class="table-word">${w}</td>
+        <td>
+          <div class="sentiment-options">
+            <div class="sentiment-radio">
+              <input type="radio" id="sent2_${i}_pos" name="sentiment2_${i}" value="positive"/>
+              <label for="sent2_${i}_pos">إيجابي</label>
+            </div>
+            <div class="sentiment-radio">
+              <input type="radio" id="sent2_${i}_neu" name="sentiment2_${i}" value="neutral"/>
+              <label for="sent2_${i}_neu">محايد</label>
+            </div>
+            <div class="sentiment-radio">
+              <input type="radio" id="sent2_${i}_neg" name="sentiment2_${i}" value="negative"/>
+              <label for="sent2_${i}_neg">سلبي</label>
+            </div>
+          </div>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  function collectSentiments(section){
+    const currentSentiments = section === 1 ? sentiments : sentiments2;
+    const currentWords = section === 1 ? words : words2;
+    const prefix = section === 1 ? 'sentiment_' : 'sentiment2_';
+    
+    Object.keys(currentSentiments).forEach(k => delete currentSentiments[k]);
+    let ok = true;
+    
+    currentWords.forEach((w,i)=>{
+      const sel = document.querySelector(`input[name="${prefix}${i}"]:checked`);
+      if(!sel) ok=false; 
+      else currentSentiments[w]=sel.value;
+    });
+    
+    return ok;
+  }
+
+  function showResults(){
+    // التحقق من البيانات الديموغرافية
+    const age = document.getElementById('age').value.trim();
+    const gender = document.querySelector('input[name="gender"]:checked');
+    const experience = document.getElementById('experience').value.trim();
+    const qualification = document.querySelector('input[name="qualification"]:checked');
+    const disabilityQual = document.querySelector('input[name="disability_qualification"]:checked');
+    const personalExp = document.querySelector('input[name="personal_experience"]:checked');
+    const teachingExp = document.querySelector('input[name="teaching_experience"]:checked');
+    
+    if (!age || !gender || !experience || !qualification || !disabilityQual || !personalExp || !teachingExp) {
+      show('error9'); return;
+    }
+    
+    // التحقق من الحقول الإضافية
+    if (disabilityQual && disabilityQual.value === 'أخرى') {
+      const otherText = document.getElementById('disability_qual_other_text').value.trim();
+      if (!otherText) { show('error9'); return; }
+    }
+    
+    if (personalExp && personalExp.value === 'تجارب أخرى') {
+      const otherText = document.getElementById('personal_exp_other_text').value.trim();
+      if (!otherText) { show('error9'); return; }
+    }
+    
+    if (teachingExp && teachingExp.value === 'نعم') {
+      const years = document.getElementById('teaching_exp_years').value.trim();
+      if (!years) { show('error9'); return; }
+    }
+    
+    hide('error9');
+    submitToGoogleSheets();
+    switchStage('stage9','results');
+    currentStage = totalStages; updateProgress();
+  }
+
+  function restart(){
+    words=[]; words2=[]; explanations={}; explanations2={}; rankings={}; rankings2={}; sentiments={}; sentiments2={}; currentStage=1;
+    document.querySelectorAll('input').forEach(i=>{ 
+      if(i.type==='text') i.value=''; 
+      if(i.type==='number') i.value=''; 
+      if(i.type==='radio') i.checked=false; 
+    });
+    document.querySelectorAll('textarea').forEach(t=>t.value='');
+    document.querySelectorAll('.error-message').forEach(e=>e.style.display='none');
+    document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
+    
+    // إعادة تعطيل الحقول الإضافية
+    document.getElementById('disability_qual_other_text').disabled = true;
+    document.getElementById('personal_exp_other_text').disabled = true;
+    document.getElementById('teaching_exp_years').disabled = true;
+    
+    document.getElementById('welcome').classList.add('active');
+    document.getElementById('progressContainer').style.display = 'none';
+    document.getElementById('progressFill').style.width = '10%';
+  }
+
+  async function submitToGoogleSheets(){
+    const scriptURL='https://script.google.com/macros/s/AKfycbxYzwnLxlCGEnyoexcQVVk3tFlf99aOvPBTvK5c_fznwS4esgpV9VIZVcOCcDY2i4fJ/exec';
+    const formData=new FormData();
+    formData.append('timestamp', new Date().toISOString());
+    formData.append('participantId', generateParticipantId());
+    
+    // القسم الأول - الكلمات والبيانات المرتبطة
+    words.forEach((w,i)=>{ 
+      formData.append(`word${i+1}`, w); 
+      formData.append(`explanation${i+1}`, explanations[w] || ''); 
+      formData.append(`ranking${i+1}`, rankings[w] || ''); 
+      formData.append(`sentiment${i+1}`, sentiments[w] || ''); 
+    });
+    
+    // القسم الثاني - الكلمات والبيانات المرتبطة
+    words2.forEach((w,i)=>{ 
+      formData.append(`wordB${i+1}`, w); 
+      formData.append(`explanationB${i+1}`, explanations2[w] || ''); 
+      formData.append(`rankingB${i+1}`, rankings2[w] || ''); 
+      formData.append(`sentimentB${i+1}`, sentiments2[w] || ''); 
+    });
+    
+    // البيانات الديموغرافية الأساسية
+    formData.append('age', document.getElementById('age').value);
+    formData.append('gender', document.querySelector('input[name="gender"]:checked')?.value || '');
+    formData.append('experience', document.getElementById('experience').value);
+    formData.append('qualification', document.querySelector('input[name="qualification"]:checked')?.value || '');
+    
+    // المتغيرات البحثية المتخصصة
+    const disabilityQual = document.querySelector('input[name="disability_qualification"]:checked');
+    if (disabilityQual && disabilityQual.value === 'أخرى') {
+      formData.append('disability_qualification', 'أخرى: ' + document.getElementById('disability_qual_other_text').value);
+    } else {
+      formData.append('disability_qualification', disabilityQual?.value || '');
+    }
+    
+    const personalExp = document.querySelector('input[name="personal_experience"]:checked');
+    if (personalExp && personalExp.value === 'تجارب أخرى') {
+      formData.append('personal_experience', 'تجارب أخرى: ' + document.getElementById('personal_exp_other_text').value);
+    } else {
+      formData.append('personal_experience', personalExp?.value || '');
+    }
+    
+    const teachingExp = document.querySelector('input[name="teaching_experience"]:checked');
+    if (teachingExp && teachingExp.value === 'نعم') {
+      formData.append('teaching_experience', 'نعم، لمدة ' + document.getElementById('teaching_exp_years').value + ' سنة/سنوات');
+    } else {
+      formData.append('teaching_experience', teachingExp?.value || '');
+    }
+    
+    // طباعة البيانات للتشخيص
+    console.log('=== DEBUGGING DATA SUBMISSION ===');
+    console.log('Words:', words);
+    console.log('Words2:', words2);
+    console.log('Explanations:', explanations);
+    console.log('Rankings:', rankings);
+    console.log('Sentiments:', sentiments);
+    
+    console.log('Form data being sent:');
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+    
+    try { 
+      console.log('Sending request to:', scriptURL);
+      const res = await fetch(scriptURL, {method:'POST', body:formData}); 
+      const result = await res.text();
+      console.log('Response status:', res.status);
+      console.log('Response text:', result);
+      
+      if(res.ok) {
+        console.log('SUCCESS: Data sent successfully');
+        showSuccessMessage(); 
+      } else {
+        console.error('ERROR: Response not OK');
+        showErrorMessage(); 
       }
     }
+    catch(e){ 
+      console.error('FETCH ERROR:', e); 
+      showErrorMessage(); 
+    }
+  }
 
-    // ====== ربط الأزرار
-    document.getElementById('startBtn').addEventListener('click', () => goTo(1));
-    document.getElementById('next1').addEventListener('click', nextPage);
-    document.getElementById('prev1').addEventListener('click', prevPage);
-    document.getElementById('next2').addEventListener('click', nextPage);
-    document.getElementById('prev2').addEventListener('click', prevPage);
-    document.getElementById('prev3').addEventListener('click', prevPage);
-    document.getElementById('submitBtn').addEventListener('click', submitForm);
+  function generateParticipantId(){ return 'P_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9); }
+  function showSuccessMessage(){ console.log('تم إرسال البيانات بنجاح'); }
+  function showErrorMessage(){ console.error('خطأ في إرسال البيانات'); }
 
-    // تهيئة
-    updateProgress();
-  </script>
+  // معالجة الحقول المشروطة
+  function handleDisabilityQualChange() {
+    const otherRadio = document.getElementById('disability_qual_other');
+    const otherText = document.getElementById('disability_qual_other_text');
+    
+    if (otherRadio && otherRadio.checked) {
+      otherText.disabled = false;
+      otherText.focus();
+    } else {
+      otherText.disabled = true;
+      otherText.value = '';
+    }
+  }
+
+  function handlePersonalExpChange() {
+    const otherRadio = document.getElementById('personal_exp_other');
+    const otherText = document.getElementById('personal_exp_other_text');
+    
+    if (otherRadio && otherRadio.checked) {
+      otherText.disabled = false;
+      otherText.focus();
+    } else {
+      otherText.disabled = true;
+      otherText.value = '';
+    }
+  }
+
+  function handleTeachingExpChange() {
+    const yesRadio = document.getElementById('teaching_exp_yes');
+    const yearsInput = document.getElementById('teaching_exp_years');
+    
+    if (yesRadio && yesRadio.checked) {
+      yearsInput.disabled = false;
+      yearsInput.focus();
+    } else {
+      yearsInput.disabled = true;
+      yearsInput.value = '';
+    }
+  }
+
+  // إتاحة الدوال عالميًا
+  window.nextStage = nextStage;
+  window.showResults = showResults;
+  window.restart = restart;
+  window.handleRankingChange = handleRankingChange;
+  window.startSurvey = startSurvey;
+  window.handleDisabilityQualChange = handleDisabilityQualChange;
+  window.handlePersonalExpChange = handlePersonalExpChange;
+  window.handleTeachingExpChange = handleTeachingExpChange;
+
+  // إضافة مستمعي الأحداث
+  document.addEventListener('DOMContentLoaded', function() {
+    const disabilityQualRadios = document.querySelectorAll('input[name="disability_qualification"]');
+    disabilityQualRadios.forEach(radio => {
+      radio.addEventListener('change', handleDisabilityQualChange);
+    });
+
+    const personalExpRadios = document.querySelectorAll('input[name="personal_experience"]');
+    personalExpRadios.forEach(radio => {
+      radio.addEventListener('change', handlePersonalExpChange);
+    });
+
+    const teachingExpRadios = document.querySelectorAll('input[name="teaching_experience"]');
+    teachingExpRadios.forEach(radio => {
+      radio.addEventListener('change', handleTeachingExpChange);
+    });
+  });
+</script>
 </body>
 </html>
